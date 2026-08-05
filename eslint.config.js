@@ -13,15 +13,25 @@ module.exports = [
       'dist/**'
     ]
   },
+
   js.configs.recommended,
+
   {
-    files: ['**/*.js'],
+    files: ['app.js', 'server.js', '*.js'],
     languageOptions: {
       ecmaVersion: 2018,
       sourceType: 'commonjs',
-      globals: {
-        ...globals.node
-      }
+      globals: { ...globals.node }
+    }
+  },
+
+  // ① Node + Playwright (e2e-tests)
+  {
+    files: ['e2e-tests/**/*.{js,jsx}'],
+    languageOptions: {
+      ecmaVersion: 2018,
+      sourceType: 'module',
+      globals: { ...globals.node }
     },
     rules: {
       indent: ['error', 2],
@@ -35,31 +45,18 @@ module.exports = [
       'no-console': 0
     }
   },
+
+  // ② React + Jest (src/test)
   {
     files: ['src/**/*.{js,jsx}', 'test/**/*.{js,jsx}'],
-    plugins: {
-      react,
-      jest
-    },
+    plugins: { react, jest },
     languageOptions: {
       ecmaVersion: 2018,
       sourceType: 'module',
-      parserOptions: {
-        ecmaFeatures: {
-          jsx: true
-        }
-      },
-      globals: {
-        ...globals.browser,
-        ...globals.es6,
-        ...globals.jest
-      }
+      parserOptions: { ecmaFeatures: { jsx: true } },
+      globals: { ...globals.browser, ...globals.es6, ...globals.jest }
     },
-    settings: {
-      react: {
-        version: 'detect'
-      }
-    },
+    settings: { react: { version: 'detect' } },
     rules: {
       ...react.configs.recommended.rules,
       indent: ['error', 2],
@@ -72,6 +69,16 @@ module.exports = [
       'arrow-spacing': ['error', { before: true, after: true }],
       'no-console': 'off',
       'react/prop-types': 0
+    }
+  },
+
+  // ③ Playwright config 専用
+  {
+    files: ['playwright.config.js'],
+    languageOptions: {
+      ecmaVersion: 2018,
+      sourceType: 'module',
+      globals: { ...globals.node }
     }
   }
 ]
