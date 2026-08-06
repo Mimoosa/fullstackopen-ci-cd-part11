@@ -1,4 +1,4 @@
-name: Deployment pipeline
+name: simple_deployment_pipeline
 
 on:
   push:
@@ -33,4 +33,47 @@ jobs:
           path: playwright-report/
           retention-days: 30
       - name: Trigger deployment
+        if: ${{ github.event_name == 'push' && !contains(github.event.head_commit.message, '#skip') }}
         run: curl ${{ secrets.RENDER_DEPLOY_HOOK }}
+  tag_release:
+    needs: [simple_deployment_pipeline]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Bump version and push tag
+        if: ${{ github.event_name == 'push' && !contains(github.event.head_commit.message, '#skip') }}
+        uses: anothrNick/github-tag-action@1.75.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BUMP: patch
+      - name: Notify success
+        if: ${{ github.event_name == 'push' && !contains(github.event.head_commit.message, '#skip') && success() }}
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          status: ${{ job.status }}
+          content: 'Deployment Successful! A new version deployed to production'
+          title: 'Deployment Details'
+          description: |
+            Commit: ${{ github.sha }}
+            Message: ${{ github.event.head_commit.message }}
+            Author: ${{ github.event.head_commit.author.name }}
+          username: Fullstack part 11 Hook
+      - name: Notify failure
+        if: ${{ failure() }}
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          status: ${{ job.status }}
+          content: 'Build Failed! The pipeline encoutered an error'
+          title: 'Failure Details'
+          description: |
+            Repository: ${{ github.repository }}
+            Branch: ${{ github.ref }}
+            Commit: ${{ github.sha }}
+            Message: ${{ github.event.head_commit.message }}
+            Author: ${{ github.event.head_commit.author.name }}
+            Workflow: ${{ github.workflow }}
+            Job: ${{ github.job }}
+          username: Fullstack part 11 Hook
+          color: 0xff0000
