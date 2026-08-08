@@ -14,3 +14,6 @@ Start by running `npm install` inside the project folder
 
 ## Render URL
 [https://fullstackopen-ci-cd-part11.onrender.com](https://fullstackopen-ci-cd-part11.onrender.com)
+
+## Link to other GitHub repo for exercise 21 and 22
+[https://github.com/Mimoosa/fullstackopen-ci-cd-part11-own-pipeline.git](https://github.com/Mimoosa/fullstackopen-ci-cd-part11-own-pipeline.git)
